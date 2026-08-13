@@ -1,43 +1,38 @@
-from typing import List, Dict, Any
+import os
+import json
+from typing import Any, Dict, Optional, Union
+
+class FileError(Exception):
+    pass
+
+def read_json_file(file_path: str) -> Optional[Dict[str, Any]]:
+    if not os.path.isfile(file_path):
+        raise FileError(f'File not found: {file_path}')  
+    if not file_path.endswith('.json'):
+        raise FileError(f'Incorrect file format, expected .json: {file_path}')  
+    try:
+        with open(file_path, 'r') as file:
+            return json.load(file)
+    except json.JSONDecodeError as e:
+        raise FileError(f'Error decoding JSON from file: {file_path}\n{str(e)}')
+    except Exception as e:
+        raise FileError(f'Unexpected error: {str(e)}')
 
 
-def merge_dicts(dicts: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """
-    Merges a list of dictionaries into a single dictionary.
-
-    Args:
-        dicts (List[Dict[str, Any]]): A list of dictionaries to merge.
-
-    Returns:
-        Dict[str, Any]: A single dictionary containing all key-value pairs.
-    """
-    merged = {}
-    for d in dicts:
-        merged.update(d)
-    return merged
+def write_json_file(file_path: str, data: Union[Dict[str, Any], list]) -> None:
+    if not file_path.endswith('.json'):
+        raise FileError(f'Incorrect file format, expected .json: {file_path}')  
+    try:
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=4)
+    except Exception as e:
+        raise FileError(f'Error writing to file: {file_path}\n{str(e)}')  
 
 
-def flatten_list(nested_list: List[List[Any]]) -> List[Any]:
-    """
-    Flattens a nested list into a single list.
-
-    Args:
-        nested_list (List[List[Any]]): A list of lists to flatten.
-
-    Returns:
-        List[Any]: A single list containing all elements.
-    """
-    return [item for sublist in nested_list for item in sublist]
-
-
-def string_to_dict(string: str) -> Dict[str, str]:
-    """
-    Converts a string of key=value pairs into a dictionary.
-
-    Args:
-        string (str): A string formatted as key=value; pairs should be separated by commas.
-
-    Returns:
-        Dict[str, str]: A dictionary mapped from the string pairs.
-    """
-    return dict(pair.split('=') for pair in string.split(', '))
+def validate_json_schema(data: Dict[str, Any], schema: Dict[str, Any]) -> bool:
+    # A simple mock function to validate the data structure
+    # In a real use case, a library like `jsonschema` would be used
+    for key in schema.keys():
+        if key not in data:
+            raise FileError(f'Missing key in data: {key}')  
+    return True
