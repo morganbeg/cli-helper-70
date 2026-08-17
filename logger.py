@@ -1,24 +1,27 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
-# Set up a logger for the application
-logger = logging.getLogger('cli_helper')
-logger.setLevel(logging.DEBUG)  # Set logging level to DEBUG
 
-# Define a rotating file handler
-handler = RotatingFileHandler('cli_helper.log', maxBytes=5*1024*1024, backupCount=3)
-handler.setLevel(logging.DEBUG)  # Log debug and above to this file
+def setup_logger(log_file='game.log', max_bytes=5 * 1024 * 1024, backup_count=5):
+    """Sets up a logger that rotates log files."""
+    # Create a logger object
+    logger = logging.getLogger('game_logger')
+    logger.setLevel(logging.DEBUG)  # Set the logging level
 
-# Create a formatter and set it for the handler
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
+    # Create a handler for rotating file logging
+    handler = RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count)
+    handler.setLevel(logging.DEBUG)  # Set level for handler
 
-# Add the handler to the logger
-logger.addHandler(handler)  
+    # Create a formatter and set it for the handler
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
 
-# Example usage of the logger
-logger.info("Logger setup complete.")
-logger.debug("This is a debug message.")
-logger.warning("This is a warning message.")
-logger.error("This is an error message.")
-logger.critical("This is a critical message.")
+    # Add the handler to the logger
+    logger.addHandler(handler)
+
+    return logger
+
+# Example usage of the logger setup
+if __name__ == '__main__':
+    logger = setup_logger()
+    logger.info('Logger has been set up.')
