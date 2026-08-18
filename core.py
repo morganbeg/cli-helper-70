@@ -1,40 +1,37 @@
-from typing import List, Dict, Any
+import random
 
 class Game:
-    """Represents a game instance."""
-    def __init__(self, name: str, genre: str, rating: float) -> None:
-        self.name = name
+    def __init__(self, title, genre):
+        self.title = title
         self.genre = genre
-        self.rating = rating
+        self.players = []
 
-    def __repr__(self) -> str:
-        return f"<Game(name={self.name}, genre={self.genre}, rating={self.rating})>"
+    def add_player(self, player_name):
+        self.players.append(player_name)
+        print(f"Player {player_name} added to {self.title}.")
 
-class GameLibrary:
-    """Manages a collection of games."""
-    def __init__(self) -> None:
-        self.games: List[Game] = []
+    def start_game(self):
+        print(f"Starting {self.title}...")
+        if not self.players:
+            print("No players available to start the game!")
+            return
+        print(f"Players: {', '.join(self.players)}")
+        self.play_round()
 
-    def add_game(self, game: Game) -> None:
-        """Adds a new game to the library."""
-        self.games.append(game)
+    def play_round(self):
+        result = random.choice(self.players)
+        print(f"{result} wins this round!")
 
-    def get_games(self) -> List[Dict[str, Any]]:
-        """Returns a list of games in the library as dictionaries."""
-        return [vars(game) for game in self.games]
+    def show_players(self):
+        print(f"Current players in {self.title}: {', '.join(self.players)}")
 
-    def find_game(self, name: str) -> Game:
-        """Finds a game by name in the library."""
-        for game in self.games:
-            if game.name.lower() == name.lower():
-                return game
-        return None
 
-# Example usage (to be removed in production):
-game1 = Game(name='Cyberpunk 2077', genre='RPG', rating=8.0)
-game2 = Game(name='The Witcher 3', genre='RPG', rating=9.5)
-library = GameLibrary()
-library.add_game(game1)
-library.add_game(game2)
-print(library.get_games())
-print(library.find_game('Cyberpunk 2077'))
+def main():
+    game = Game("Galactic Battle", "Strategy")
+    game.add_player("Alice")
+    game.add_player("Bob")
+    game.start_game()
+    game.show_players()
+
+if __name__ == "__main__":
+    main()
