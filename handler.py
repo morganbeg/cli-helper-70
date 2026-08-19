@@ -1,32 +1,38 @@
-import requests
-import time
-from requests.exceptions import RequestException
+import json
+import os
 
-def retry_request(url, max_retries=3, delay=2):
-    """
-    Make a GET request to the specified URL with retry logic.
-    :param url: URL to send the GET request.
-    :param max_retries: Maximum number of retries before failing.
-    :param delay: Delay in seconds between retries.
-    :return: Response object if successful, None otherwise.
-    """
-    for attempt in range(max_retries):
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Check for HTTP errors
-            return response
-        except RequestException as e:
-            print(f'Attempt {attempt + 1} failed: {e}')
-            if attempt < max_retries - 1:
-                time.sleep(delay)
-            else:
-                print('All attempts failed.')
-                return None
+class GameHandler:
+    def __init__(self, game_data_file):
+        self.game_data_file = game_data_file
+        self.games = self.load_games()
 
-# Example usage
-if __name__ == '__main__':
-    result = retry_request('https://example.com')
-    if result:
-        print('Request succeeded:', result.content)
-    else:
-        print('Request failed after retries.')
+    def load_games(self):
+        """Load games from a JSON file."""
+        if not os.path.exists(self.game_data_file):
+            return []
+        with open(self.game_data_file, 'r') as file:
+            return json.load(file)
+
+    def save_games(self):
+        """Save the games to a JSON file."""
+        with open(self.game_data_file, 'w') as file:
+            json.dump(self.games, file, indent=4)
+
+    def add_game(self, game):
+        """Add a new game to the list."""
+        self.games.append(game)
+        self.save_games()
+
+    def remove_game(self, game_name):
+        """Remove a game by its name."""
+        self.games = [g for g in self.games if g['name'] != game_name]
+        self.save_games()
+
+    def get_games(self):
+        """Retrieve the list of games."""
+        return self.games
+
+# Example usage:
+# handler = GameHandler('games.json')
+# handler.add_game({'name': 'Game1', 'genre': 'Action'})
+# print(handler.get_games())
